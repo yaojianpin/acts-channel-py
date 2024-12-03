@@ -1,0 +1,3 @@
+{
+  "python.analysis.extraPaths": ["./proto/acts_pb2_", "./src/proto/acts_pb2_"]
+}

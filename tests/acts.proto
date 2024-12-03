@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package acts.grpc;
+
+message MessageOptions {
+
+  string client_id = 1;
+
+  // message type
+  string type = 2;
+
+  // message event
+  string state = 3;
+
+  // model tag
+  string tag = 4;
+
+  // message key
+  string key = 5;
+}
+message WorkflowOptions {}
+
+message ActionOptions {
+  string name = 1;
+  string options = 2;
+}
+
+message WorkflowState {
+  string pid = 1;
+  string mid = 2;
+  string event = 3;
+  string state = 4;
+  int64 start_time = 5;
+  int64 end_time = 6;
+  string outputs = 7;
+}
+
+message WorkflowModel {
+  string id = 1;
+  string tag = 2;
+  string name = 3;
+}
+message WorkflowMessage {
+  string id = 1;
+  string name = 2;
+  string state = 3;
+  string type = 4;
+  string source = 5;
+  WorkflowModel model = 6;
+  string pid = 9;
+  string tid = 10;
+  string key = 11;
+  string tag = 12;
+
+  ProtoJsonValue inputs = 13;
+  ProtoJsonValue outputs = 14;
+  int64 start_time = 15;
+  int64 end_time = 16;
+}
+
+service ActsService {
+  rpc onMessage(MessageOptions) returns (stream WorkflowMessage) {}
+  rpc action(ActionOptions) returns (ProtoJsonValue) {}
+}
