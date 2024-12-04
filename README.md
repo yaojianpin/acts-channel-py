@@ -16,14 +16,16 @@ pip install acts-channel
 import signal
 import sys
 import time
-import acts_channel
+
+from acts_channel import Channel
+
 
 def signal_handler(signal, frame):
     print('Caught Ctrl+C / SIGINT signal')
     sys.exit(0)
 
 def main():
-    chan = channel.Channel(url = "127.0.0.1:10080")
+    chan = Channel(url = "127.0.0.1:10080")
     signal.signal(signal.SIGINT, signal_handler)
     model = """
     id: test
@@ -35,28 +37,25 @@ def main():
               - act: irq
                 key: abc
     """
-    # deploy a workflow model
     resp = chan.deploy(model)
-    print(resp.ok_value)
 
-    # get the model info
+    ret = resp.unwrap_or_raise(ValueError)
+    print("chan.deploy:", ret)
+
     resp = chan.send("model:get", { "id": "test", "fmt": "tree"})
     print(resp.ok_value["data"])
 
-    # subscribe messages from server
     chan.subscribe("client-1", on_message)
 
-    # start a workflow by model id and custom data
     resp = chan.start("test", { "custom": "aaa" })
     print(resp.ok_value)
 
     print("waiting for all messages...")
     time.sleep(5)
 
-def on_message(chan: channel.Channel, message):
+def on_message(chan: Channel, message):
     print(f"on_message: {message}")
     if message["key"] == "abc":
-        # execute act from client
         chan.act("complete", message["pid"], message["tid"], {})
 
 

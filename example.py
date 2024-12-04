@@ -1,15 +1,16 @@
 import signal
 import sys
 import time
-import channel
 
-# python -m grpc_tools.protoc -I./proto --python_out=./src/proto --grpc_python_out=./src/proto acts.proto 
+from acts_channel import Channel
+
+
 def signal_handler(signal, frame):
     print('Caught Ctrl+C / SIGINT signal')
     sys.exit(0)
     
 def main():
-    chan = channel.Channel(url = "127.0.0.1:10080")
+    chan = Channel(url = "127.0.0.1:10080")
     signal.signal(signal.SIGINT, signal_handler)
     model = """
     id: test
@@ -22,7 +23,9 @@ def main():
                 key: abc
     """
     resp = chan.deploy(model)
-    print(resp.ok_value)
+
+    ret = resp.unwrap_or_raise(ValueError)
+    print("chan.deploy:", ret)
 
     resp = chan.send("model:get", { "id": "test", "fmt": "tree"})
     print(resp.ok_value["data"])
@@ -35,7 +38,7 @@ def main():
     print("waiting for all messages...")
     time.sleep(5)
 
-def on_message(chan: channel.Channel, message):
+def on_message(chan: Channel, message):
     print(f"on_message: {message}")
     if message["key"] == "abc":
         chan.act("complete", message["pid"], message["tid"], {})

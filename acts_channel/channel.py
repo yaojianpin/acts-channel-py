@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 import threading
 from typing import Any, Optional,Callable
-from proto import acts_pb2_grpc, acts_pb2
+from acts_channel.proto import acts_pb2_grpc, acts_pb2
 import grpc
 import json
-import nanoid
 from result import Result, Ok, Err
+import nanoid
 
 @dataclass
 class ActsOptions:
