@@ -1,6 +1,6 @@
 [project]
 name = "acts-channel"
-version = "0.2.0"
+version = "0.3.0"
 description = "acts channel client"
 authors = [{ name = "yaojianping", email = "yaojianpin@sohu.com" }]
 dependencies = ["nanoid>=2.0.0", "result>=0.17.0"]

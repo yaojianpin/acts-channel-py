@@ -13,13 +13,72 @@ class ActsOptions:
     state: Optional[str]
     tag: Optional[str]
     key: Optional[str]
+    uses: Optional[str]
     ack: Optional[bool]
 
 @dataclass
 class Package:
     id: str
-    name: str
-    body: str
+    '''
+    package unique id,
+    such as acts.app.example
+    '''
+
+    desc: str
+    '''
+    package description
+    '''
+
+    icon: str
+    '''
+    icon name, such as icon-example
+    '''
+    
+    doc: str
+    '''
+    help doc url
+    '''
+    
+    version: str
+    '''
+    package version
+    '''
+    
+    schema: str
+    '''
+    jsonschema definition for package params
+    '''
+
+    run_as: str
+    '''
+    should be one of 'irq', 'msg'
+    irq:  interrupt request
+    msg:  message without response to acts server
+    '''
+    
+    resouces: str
+    '''
+    define the package operations in json
+    # example:
+    [
+        {
+            "name": "my resource"
+            "desc": "resouce description"
+            "operations": [
+                { 
+                    "name": "operation 1", 
+                    "desc": "operation description",
+                    "value": "value1" 
+                }
+            ]
+        }
+    ]
+    '''
+
+    catalog: str
+    '''
+    one of transform, form, ai, app
+    '''
 
 @dataclass
 class Error:
@@ -55,8 +114,8 @@ class Channel(object):
         steps:
             - name: step1
         \"\"\"
-        # publish a model
-        resp = chan.send("pack:publish", model)
+        # deploy a model
+        resp = chan.send("pack:deploy", model)
         print(resp)
         ```
         """
@@ -104,26 +163,28 @@ class Channel(object):
         return self.send("proc:start", options)
 
 
-    def subscribe(self, clientid: str, callback: Callable[[object, Any], None],  optoins: Optional[ActsOptions] = None):
+    def subscribe(self, clientid: str, callback: Callable[[object, Any], None],  options: Optional[ActsOptions] = None):
         """ subscribe messages
             Args:
                 clientid     (str):         the client id.
                 callback     (object):      callback with messages.
                 options      (ActsOptions)  options for type, tag, key and state in glob pattern
         """
-        messageOptions = acts_pb2.MessageOptions(client_id = clientid, type="*", state="*", tag="*", key="*")
+        messageOptions = acts_pb2.MessageOptions(client_id = clientid, type="*", state="*", tag="*", key="*", uses="*")
         ack = True
-        if optoins:
-            if optoins.type:
-                messageOptions.type = optoins.type
-            if optoins.state:
-                messageOptions.state = optoins.state
-            if optoins.tag:
-                messageOptions.tag = optoins.tag
-            if optoins.key:
-                messageOptions.key = optoins.key
-            if optoins.ack != None:
-                ack = optoins.ack
+        if options:
+            if options.type:
+                messageOptions.type = options.type
+            if options.state:
+                messageOptions.state = options.state
+            if options.tag:
+                messageOptions.tag = options.tag
+            if options.key:
+                messageOptions.key = options.key
+            if options.uses:
+                messageOptions.uses = options.uses
+            if options.ack != None:
+                ack = options.ack
 
         thread = threading.Thread(target=self.__on_message, args=(ack, messageOptions, callback))
         thread.daemon = True
