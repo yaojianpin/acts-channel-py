@@ -30,12 +30,13 @@ def main():
     model = """
     id: test
     name: workflow in python
+    ver: 0.1.0
     steps:
         - name: step 1
           id: step1
-          acts:
-              - uses: acts.core.irq
-                key: abc
+          uses: acts.core.irq
+          params:
+            key: abc
     """
     resp = chan.deploy(model)
 

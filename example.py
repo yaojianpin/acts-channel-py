@@ -15,12 +15,13 @@ def main():
     model = """
     id: test
     name: workflow in python
+    ver: 0.1.0
     steps:
         - name: step 1
           id: step1
-          acts:
-              - uses: acts.core.irq
-                key: abc
+          uses: acts.core.irq
+          params:
+            key: abc
     """
     resp = chan.deploy(model)
 
@@ -40,7 +41,9 @@ def main():
 
 def on_message(chan: Channel, message):
     print(f"on_message: {message}")
-    if message["key"] == "abc":
+    inputs = message.get("inputs", {})
+    params = inputs.get("params", {}) if isinstance(inputs, dict) else {}
+    if params.get("key") == "abc" and message.get("state") == "created":
         chan.act("complete", message["pid"], message["tid"], {})
 
 

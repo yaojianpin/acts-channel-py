@@ -12,7 +12,6 @@ class ActsOptions:
     type: Optional[str]
     state: Optional[str]
     tag: Optional[str]
-    key: Optional[str]
     uses: Optional[str]
     ack: Optional[bool]
 
@@ -64,13 +63,9 @@ class Package:
         {
             "name": "my resource"
             "desc": "resouce description"
-            "operations": [
-                { 
-                    "name": "operation 1", 
-                    "desc": "operation description",
-                    "value": "value1" 
-                }
-            ]
+            "value": {
+                "key1": "value1"
+            }
         }
     ]
     '''
@@ -168,9 +163,9 @@ class Channel(object):
             Args:
                 clientid     (str):         the client id.
                 callback     (object):      callback with messages.
-                options      (ActsOptions)  options for type, tag, key and state in glob pattern
+                options      (ActsOptions)  options for type, tag and state in glob pattern
         """
-        messageOptions = acts_pb2.MessageOptions(client_id = clientid, type="*", state="*", tag="*", key="*", uses="*")
+        messageOptions = acts_pb2.MessageOptions(client_id = clientid, type="*", state="*", tag="*", uses="*")
         ack = True
         if options:
             if options.type:
@@ -179,8 +174,6 @@ class Channel(object):
                 messageOptions.state = options.state
             if options.tag:
                 messageOptions.tag = options.tag
-            if options.key:
-                messageOptions.key = options.key
             if options.uses:
                 messageOptions.uses = options.uses
             if options.ack != None:
@@ -197,7 +190,7 @@ class Channel(object):
             Args:
                 clientid     (str):         the client id.
                 callback     (object):      callback with messages.
-                options      (ActsOptions)  options for type, tag, key and state in glob pattern
+                options      (ActsOptions)  options for type, tag and state in glob pattern
         """
         try:
             message = acts_pb2.Message(seq=self.__create_seq(), 
@@ -230,10 +223,15 @@ class Channel(object):
             for message in messages:
                 if ack:
                     self.ack(message.seq)
-                data = json.loads(message.data.decode('utf-8'))
-                callback(self, data)
-        except:
-            self.__del__()
+                try:
+                    data = json.loads(message.data.decode('utf-8'))
+                    callback(self, data)
+                except Exception as e:
+                    print(f"on_message error: {e}")
+        except Exception as e:
+            print(f"subscribe error: {e}")
+        finally:
+            self.channel.close()
 
     def __create_seq(self) ->str:
         return nanoid.generate(alphabet="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")

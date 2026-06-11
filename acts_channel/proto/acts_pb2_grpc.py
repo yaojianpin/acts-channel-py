@@ -5,7 +5,7 @@ import warnings
 
 import acts_channel.proto.acts_pb2 as acts__pb2
 
-GRPC_GENERATED_VERSION = '1.68.0'
+GRPC_GENERATED_VERSION = '1.81.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -18,14 +18,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in acts_pb2_grpc.py depends on'
+        + ' but the generated code in acts_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class ActsServiceStub(object):
+class ActsServiceStub:
     """acts service
     """
 
@@ -47,7 +47,7 @@ class ActsServiceStub(object):
                 _registered_method=True)
 
 
-class ActsServiceServicer(object):
+class ActsServiceServicer:
     """acts service
     """
 
@@ -87,7 +87,7 @@ def add_ActsServiceServicer_to_server(servicer, server):
 
 
  # This class is part of an EXPERIMENTAL API.
-class ActsService(object):
+class ActsService:
     """acts service
     """
 

@@ -10,10 +10,8 @@ message MessageOptions {
   string state = 3;
   // model tag
   string tag = 4;
-  // message key
-  string key = 5;
   // message uses
-  string uses = 6;
+  string uses = 5;
 }
 
 // grpc message with server or client
@@ -27,8 +25,5 @@ message Message {
 // acts service
 service ActsService {
   rpc Send(Message) returns (Message) {}
-  // rpc OnFlow(Message) returns (stream Message) {}
-  // rpc OnStep(Message) returns (stream Message) {}
-  // rpc OnAct(Message) returns (stream Message) {}
   rpc OnMessage(MessageOptions) returns (stream Message) {}
 }
